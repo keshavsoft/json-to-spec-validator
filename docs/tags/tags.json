@@ -1,0 +1,285 @@
+{
+    "$schema": "./tags.schema.json",
+    "div": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "title",
+            "role"
+        ],
+        "childTags": []
+    },
+    "input": {
+        "allowsTextContent": false,
+        "allowsChildren": false,
+        "allowedAttributes": [
+            "type",
+            "placeholder",
+            "value",
+            "name",
+            "disabled",
+            "readonly",
+            "required",
+            "list",
+            "class",
+            "id"
+        ]
+    },
+    "checkbox": {
+        "allowsTextContent": false,
+        "allowsChildren": false,
+        "allowedAttributes": [
+            "type",
+            "checked",
+            "name",
+            "value",
+            "disabled",
+            "required"
+        ]
+    },
+    "colgroup": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "span"
+        ],
+        "childTags": [
+            "col"
+        ]
+    },
+    "col": {
+        "allowsTextContent": false,
+        "allowsChildren": false,
+        "allowedAttributes": [
+            "span",
+            "style",
+            "width"
+        ]
+    },
+    "label": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "for"
+        ],
+        "childTags": []
+    },
+    "form": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "action",
+            "method",
+            "autocomplete",
+            "enctype",
+            "name",
+            "novalidate",
+            "target"
+        ],
+        "childTags": []
+    },
+    "select": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "name",
+            "disabled",
+            "required",
+            "multiple",
+            "size"
+        ],
+        "childTags": [
+            "option"
+        ]
+    },
+    "p": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [],
+        "childTags": []
+    },
+    "h1": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [],
+        "childTags": []
+    },
+    "h2": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [],
+        "childTags": []
+    },
+    "span": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [],
+        "childTags": []
+    },
+    "img": {
+        "allowsTextContent": false,
+        "allowsChildren": false,
+        "allowedAttributes": [
+            "src",
+            "alt",
+            "width",
+            "height",
+            "loading"
+        ]
+    },
+    "button": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "type",
+            "disabled",
+            "name",
+            "value"
+        ],
+        "childTags": []
+    },
+    "table": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "border",
+            "cellpadding",
+            "cellspacing"
+        ],
+        "childTags": [
+            "caption",
+            "colgroup",
+            "thead",
+            "tbody",
+            "tfoot",
+            "tr"
+        ]
+    },
+    "thead": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [],
+        "childTags": [
+            "tr"
+        ]
+    },
+    "tbody": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [],
+        "childTags": [
+            "tr"
+        ]
+    },
+    "tfoot": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [],
+        "childTags": [
+            "tr"
+        ]
+    },
+    "tr": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [],
+        "childTags": [
+            "td",
+            "th"
+        ]
+    },
+    "th": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "scope",
+            "colspan",
+            "rowspan"
+        ],
+        "childTags": []
+    },
+    "td": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "colspan",
+            "rowspan"
+        ],
+        "childTags": []
+    },
+    "datalist": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [],
+        "childTags": [
+            "option"
+        ]
+    },
+    "option": {
+        "allowsTextContent": true,
+        "allowsChildren": false,
+        "allowedAttributes": [
+            "value",
+            "label",
+            "selected",
+            "disabled"
+        ]
+    },
+    "header": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "role"
+        ],
+        "childTags": []
+    },
+    "a": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "href",
+            "target",
+            "rel",
+            "title",
+            "download"
+        ],
+        "childTags": []
+    },
+    "i": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "aria-hidden"
+        ],
+        "childTags": []
+    },
+    "small": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [],
+        "childTags": []
+    },
+    "ul": {
+        "allowsTextContent": false,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "type"
+        ],
+        "childTags": [
+            "li"
+        ]
+    },
+    "li": {
+        "allowsTextContent": true,
+        "allowsChildren": true,
+        "allowedAttributes": [
+            "value"
+        ],
+        "childTags": []
+    },
+    "hr": {
+        "allowsTextContent": false,
+        "allowsChildren": false,
+        "allowedAttributes": []
+    }
+}

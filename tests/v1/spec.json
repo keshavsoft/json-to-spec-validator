@@ -1,0 +1,9 @@
+{
+    "tagName": "input",
+    "attributes": {
+        "type": "text",
+        "placeholder": "enter ${columnName}",
+        "name": "${columnName}",
+        "class": "form-control"
+    }
+}

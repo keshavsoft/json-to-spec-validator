@@ -1,0 +1,7 @@
+{
+    "tagName": "button",
+    "textContent": "${columnName}",
+    "attributes": {
+        "class": "btn btn-primary btn-sm"
+    }
+}

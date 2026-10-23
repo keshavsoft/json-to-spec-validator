@@ -1,196 +1,81 @@
 import tags from "../../docs/tags/tags.json" with { type: "json" };
 
-const isPlainObject = ({ inValue }) => {
-    const localValue = inValue;
-    return localValue !== null && typeof localValue === "object" && !Array.isArray(localValue);
-};
+const isPlainObject = (value) =>
+    value !== null && typeof value === "object" && !Array.isArray(value);
 
-const childPath = ({ inBase, inKey }) => {
-    const localBase = inBase;
-    const localKey = inKey;
-    return localBase ? `${localBase}.${localKey}` : String(localKey);
-};
+const childPath = (base, key) => base ? `${base}.${key}` : String(key);
 
-const getTagDefinition = ({ inTagName }) => {
-    const localTagName = inTagName;
-    const normalizedTag = localTagName.toLowerCase();
-    const definition = Object.hasOwn(tags, normalizedTag) ? tags[normalizedTag] : undefined;
-    return {
-        normalizedTag,
-        definition: (definition && typeof definition === "object") ? definition : undefined
-    };
-};
-
-const validateTagStructure = ({ inSpec, inPath, inErrors }) => {
-    const localSpec = inSpec;
-    const localPath = inPath;
-    const localErrors = inErrors;
-
-    if (!isPlainObject({ inValue: localSpec })) {
-        localErrors.push({ path: localPath, message: "Expected an element specification, string, or number." });
-        return { isValid: false };
+const validateNode = (spec, path, errors) => {
+    if (typeof spec === "string" || typeof spec === "number") return;
+    if (!isPlainObject(spec)) {
+        errors.push({ path, message: "Expected an element specification, string, or number." });
+        return;
+    }
+    if (typeof spec.tagName !== "string" || !spec.tagName.trim()) {
+        errors.push({ path: childPath(path, "tagName"), message: "tagName must be a non-empty string." });
+        return;
     }
 
-    if (typeof localSpec.tagName !== "string" || !localSpec.tagName.trim()) {
-        localErrors.push({ path: childPath({ inBase: localPath, inKey: "tagName" }), message: "tagName must be a non-empty string." });
-        return { isValid: false };
+    const tagName = spec.tagName.toLowerCase();
+    const definition = Object.hasOwn(tags, tagName) ? tags[tagName] : undefined;
+    if (!definition || typeof definition !== "object") {
+        errors.push({ path: childPath(path, "tagName"), message: `Unsupported tag: ${spec.tagName}.` });
+        return;
     }
 
-    const { normalizedTag, definition } = getTagDefinition({ inTagName: localSpec.tagName });
-    if (!definition) {
-        localErrors.push({ path: childPath({ inBase: localPath, inKey: "tagName" }), message: `Unsupported tag: ${localSpec.tagName}.` });
-        return { isValid: false };
+    if (spec.textContent !== undefined && !definition.allowsTextContent) {
+        errors.push({ path: childPath(path, "textContent"), message: `<${tagName}> does not allow textContent.` });
     }
-
-    return { isValid: true, normalizedTag, definition };
-};
-
-const validateTextContent = ({ inSpec, inPath, inDefinition, inNormalizedTag, inErrors }) => {
-    const localSpec = inSpec;
-    const localPath = inPath;
-    const localDefinition = inDefinition;
-    const localNormalizedTag = inNormalizedTag;
-    const localErrors = inErrors;
-
-    if (localSpec.textContent !== undefined && !localDefinition.allowsTextContent) {
-        localErrors.push({
-            path: childPath({ inBase: localPath, inKey: "textContent" }),
-            message: `<${localNormalizedTag}> does not allow textContent.`
-        });
-    }
-};
-
-const validateSections = ({ inSpec, inPath, inErrors }) => {
-    const localSpec = inSpec;
-    const localPath = inPath;
-    const localErrors = inErrors;
 
     for (const section of ["attributes", "properties"]) {
-        if (localSpec[section] !== undefined && !isPlainObject({ inValue: localSpec[section] })) {
-            localErrors.push({
-                path: childPath({ inBase: localPath, inKey: section }),
-                message: `${section} must be an object.`
-            });
+        if (spec[section] !== undefined && !isPlainObject(spec[section])) {
+            errors.push({ path: childPath(path, section), message: `${section} must be an object.` });
         }
     }
-};
 
-const validateAttributes = ({ inAttributes, inPath, inDefinition, inNormalizedTag, inErrors }) => {
-    const localAttributes = inAttributes;
-    const localPath = inPath;
-    const localDefinition = inDefinition;
-    const localNormalizedTag = inNormalizedTag;
-    const localErrors = inErrors;
-
-    if (!isPlainObject({ inValue: localAttributes })) return;
-
-    const allowed = localDefinition.allowedAttributes || [];
-    for (const attrName of Object.keys(localAttributes)) {
-        if (!allowed.includes(attrName)) {
-            localErrors.push({
-                path: childPath({
-                    inBase: childPath({ inBase: localPath, inKey: "attributes" }),
-                    inKey: attrName
-                }),
-                message: `Attribute "${attrName}" is not listed as allowed for <${localNormalizedTag}>.`
-            });
+    if (isPlainObject(spec.attributes)) {
+        for (const attrName of Object.keys(spec.attributes)) {
+            if (!(definition.allowedAttributes || []).includes(attrName)) {
+                errors.push({
+                    path: childPath(childPath(path, "attributes"), attrName),
+                    message: `Attribute "${attrName}" is not listed as allowed for <${tagName}>.`
+                });
+            }
         }
     }
-};
 
-const validateChildren = ({ inChildren, inPath, inDefinition, inNormalizedTag, inErrors }) => {
-    const localChildren = inChildren;
-    const localPath = inPath;
-    const localDefinition = inDefinition;
-    const localNormalizedTag = inNormalizedTag;
-    const localErrors = inErrors;
-
-    if (localChildren === undefined) return { isValid: true, childrenList: [] };
-
-    if (!Array.isArray(localChildren)) {
-        localErrors.push({ path: childPath({ inBase: localPath, inKey: "children" }), message: "children must be an array." });
-        return { isValid: false, childrenList: [] };
+    if (spec.children !== undefined && !Array.isArray(spec.children)) {
+        errors.push({ path: childPath(path, "children"), message: "children must be an array." });
+        return;
     }
 
-    if (localChildren.length && !localDefinition.allowsChildren) {
-        localErrors.push({
-            path: childPath({ inBase: localPath, inKey: "children" }),
-            message: `<${localNormalizedTag}> does not allow children.`
-        });
+    const children = spec.children || [];
+    if (children.length && !definition.allowsChildren) {
+        errors.push({ path: childPath(path, "children"), message: `<${tagName}> does not allow children.` });
     }
 
-    const allowedChildTags = localDefinition.childTags;
+    const allowedChildTags = definition.childTags;
     if (Array.isArray(allowedChildTags) && allowedChildTags.length) {
-        localChildren.forEach((child, index) => {
-            if (isPlainObject({ inValue: child }) && typeof child.tagName === "string" &&
+        children.forEach((child, index) => {
+            if (isPlainObject(child) && typeof child.tagName === "string" &&
                 !allowedChildTags.includes(child.tagName.toLowerCase())) {
-                localErrors.push({
-                    path: childPath({ inBase: childPath({ inBase: localPath, inKey: "children" }), inKey: index }),
-                    message: `<${child.tagName}> is not listed as an allowed child of <${localNormalizedTag}>.`
+                errors.push({
+                    path: childPath(childPath(path, "children"), index),
+                    message: `<${child.tagName}> is not listed as an allowed child of <${tagName}>.`
                 });
             }
         });
     }
-
-    return { isValid: true, childrenList: localChildren };
+    children.forEach((child, index) => validateNode(child, childPath(childPath(path, "children"), index), errors));
 };
 
-const validateNode = ({ inSpec, inPath, inErrors }) => {
-    const localSpec = inSpec;
-    const localPath = inPath;
-    const localErrors = inErrors;
-
-    if (typeof localSpec === "string" || typeof localSpec === "number") return;
-
-    const { isValid, normalizedTag, definition } = validateTagStructure({
-        inSpec: localSpec,
-        inPath: localPath,
-        inErrors: localErrors
-    });
-    if (!isValid) return;
-
-    validateTextContent({
-        inSpec: localSpec,
-        inPath: localPath,
-        inDefinition: definition,
-        inNormalizedTag: normalizedTag,
-        inErrors: localErrors
-    });
-
-    validateSections({
-        inSpec: localSpec,
-        inPath: localPath,
-        inErrors: localErrors
-    });
-
-    validateAttributes({
-        inAttributes: localSpec.attributes,
-        inPath: localPath,
-        inDefinition: definition,
-        inNormalizedTag: normalizedTag,
-        inErrors: localErrors
-    });
-
-    const { childrenList } = validateChildren({
-        inChildren: localSpec.children,
-        inPath: localPath,
-        inDefinition: definition,
-        inNormalizedTag: normalizedTag,
-        inErrors: localErrors
-    });
-
-    childrenList.forEach((child, index) => validateNode({
-        inSpec: child,
-        inPath: childPath({ inBase: childPath({ inBase: localPath, inKey: "children" }), inKey: index }),
-        inErrors: localErrors
-    }));
-};
-
-const validateSpec = ({ inSpec }) => {
-    const localSpec = inSpec;
+const validateSpec = (specOrConfig) => {
+    const spec = (specOrConfig && typeof specOrConfig === "object" && "spec" in specOrConfig)
+        ? specOrConfig.spec
+        : specOrConfig;
     const errors = [];
 
-    validateNode({ inSpec: localSpec, inPath: "spec", inErrors: errors });
+    validateNode(spec, "spec", errors);
 
     return { isValid: errors.length === 0, errors };
 };

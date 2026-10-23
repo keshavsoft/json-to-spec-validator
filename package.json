@@ -1,12 +1,16 @@
 {
-  "name": "json-to-tag-validator",
-  "version": "0.1.0",
+  "name": "json-to-spec-validator",
+  "version": "1.2.1",
   "description": "Validates JSON element specifications against the JSON-to-Tag tag catalog.",
   "type": "module",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
   "exports": {
-    ".": "./src/v1/index.js",
-    "./v1": "./src/v1/index.js",
-    "./tags": "./docs/tags/tags.json"
+    ".": {
+      "import": "./src/index.js",
+      "require": "./src/index.js",
+      "default": "./src/index.js"
+    }
   },
   "scripts": {
     "test": "node --test"
